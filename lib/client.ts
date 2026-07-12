@@ -1,1 +1,5 @@
-export const PETSTORE_API_BASE_URL = "https://petstore3.swagger.io/api/v3";
+import createClient from "openapi-fetch";
+import { paths } from "./api/apiTypes.schema";
+export const client = createClient<paths>({
+  baseUrl: "https://dummyjson.com/",
+});

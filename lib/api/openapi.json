@@ -1,0 +1,3325 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Store API",
+    "description": "Manage pets, orders, purchases, users, and other operations in the pet shop.",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "Pet"
+    },
+    {
+      "name": "Chat"
+    },
+    {
+      "name": "Store"
+    },
+    {
+      "name": "Payments"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Webhooks"
+    }
+  ],
+  "paths": {
+    "/pets": {
+      "get": {
+        "summary": "List Pets",
+        "deprecated": false,
+        "description": "Retrieve a paginated list of pets available for adoption with optional filtering.",
+        "operationId": "listPets",
+        "tags": [
+          "Pet"
+        ],
+        "parameters": [
+          {
+            "name": "species",
+            "in": "query",
+            "description": "Filter by pet species",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DOG",
+                "CAT",
+                "RABBIT",
+                "BIRD",
+                "REPTILE",
+                "OTHER"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by adoption status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "AVAILABLE",
+                "PENDING",
+                "ADOPTED"
+              ],
+              "default": "AVAILABLE"
+            }
+          },
+          {
+            "name": "ageMin",
+            "in": "query",
+            "description": "Minimum age in months",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "ageMax",
+            "in": "query",
+            "description": "Maximum age in months",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Filter by pet size",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SMALL",
+                "MEDIUM",
+                "LARGE"
+              ]
+            }
+          },
+          {
+            "name": "goodWithKids",
+            "in": "query",
+            "description": "Filter pets that are good with children",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number for pagination",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with pet collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetCollection"
+                },
+                "examples": {
+                  "multiple-pets": {
+                    "summary": "Multiple pets available",
+                    "value": {
+                      "data": [
+                        {
+                          "id": "01936c8f-1234-7000-8000-111111111111",
+                          "species": "CAT",
+                          "name": "Whiskers",
+                          "breed": "Domestic Shorthair",
+                          "ageMonths": 18,
+                          "size": "MEDIUM",
+                          "color": "Orange Tabby",
+                          "gender": "MALE",
+                          "goodWithKids": true,
+                          "price": "75.00",
+                          "description": "Friendly and playful orange tabby looking for a loving home",
+                          "status": "AVAILABLE",
+                          "photos": [
+                            "https://cdn.petstoreapi.com/pets/01936c8f-1234-7000-8000-111111111111/photo1.jpg"
+                          ]
+                        },
+                        {
+                          "id": "01936c8f-2345-7000-8000-222222222222",
+                          "species": "DOG",
+                          "name": "Max",
+                          "breed": "Labrador Retriever",
+                          "ageMonths": 36,
+                          "size": "LARGE",
+                          "color": "Yellow",
+                          "gender": "MALE",
+                          "goodWithKids": true,
+                          "price": "150.00",
+                          "description": "Energetic and loyal lab who loves fetch and long walks",
+                          "status": "AVAILABLE",
+                          "photos": [
+                            "https://cdn.petstoreapi.com/pets/01936c8f-2345-7000-8000-222222222222/photo1.jpg"
+                          ]
+                        }
+                      ],
+                      "pagination": {
+                        "page": 1,
+                        "limit": 20,
+                        "totalItems": 45,
+                        "totalPages": 3
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "RateLimit-Limit": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Remaining": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Reset": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create Pet",
+        "deprecated": false,
+        "description": "Add a new pet to the store catalog, making it available for adoption.\n\n## Pet Lifecycle Workflow\n\nWhen a new pet enters the system:\n\n1. **Intake**: Staff creates a pet record with this endpoint (status: `available`)\n2. **Profile**: Pet details include species, breed, age, medical info, photos, and adoption fee\n3. **Discovery**: Pet appears in search results and listings\n4. **Adoption Application**: Potential adopters can apply through the adoption endpoints\n5. **Adoption**: Once approved, pet status changes to `adopted`\n6. **Post-Adoption**: Pet record is retained for historical purposes\n\n**Access**: This operation requires staff permissions (`write:pets` scope or valid Bearer token). Only authenticated staff members can add pets to the system.",
+        "operationId": "createPet",
+        "tags": [
+          "Pet"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pet"
+              },
+              "example": {
+                "name": "Max",
+                "species": "DOG",
+                "breed": "Golden Retriever",
+                "ageMonths": 24,
+                "size": "LARGE",
+                "color": "Golden",
+                "gender": "MALE",
+                "goodWithKids": true,
+                "price": "250.00",
+                "currency": "USD",
+                "status": "AVAILABLE",
+                "description": "Friendly golden retriever looking for an active family",
+                "medicalInfo": {
+                  "vaccinated": true,
+                  "spayedNeutered": true,
+                  "microchipped": true,
+                  "specialNeeds": false,
+                  "healthNotes": "Up to date on all vaccinations"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Pet created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                }
+              }
+            },
+            "headers": {
+              "RateLimit-Limit": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Remaining": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Reset": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": [
+              "write:pets"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "TypeScript",
+            "label": "TypeScript SDK",
+            "source": "import { PetStoreAPI } from '@petstoreapi/sdk';\n\nconst client = new PetStoreAPI({\n  accessToken: process.env.OAUTH_ACCESS_TOKEN\n});\n\nconst newPet = await client.pets.create({\n  species: 'dog',\n  name: 'Buddy',\n  breed: 'Golden Retriever',\n  ageMonths: 24,\n  size: 'large',\n  color: 'Golden',\n  gender: 'male',\n  goodWithKids: true,\n\n  price: '150.00',\n  description: 'Friendly golden retriever looking for an active family'\n});\n\nconsole.log(`Created pet with ID: ${newPet.id}`);"
+          },
+          {
+            "lang": "Python",
+            "label": "Python",
+            "source": "from petstore import PetStoreAPI\n\nclient = PetStoreAPI(access_token=os.environ['OAUTH_ACCESS_TOKEN'])\n\nnew_pet = client.pets.create(\n    species='dog',\n    name='Buddy',\n    breed='Golden Retriever',\n    ageMonths=24,\n    size='large',\n    color='Golden',\n    gender='male',\n    goodWithKids=True,\n\n    price='150.00',\n    description='Friendly golden retriever looking for an active family'\n)\n\nprint(f\"Created pet with ID: {new_pet.id}\")"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "JavaScript (Fetch)",
+            "source": "const response = await fetch(\n  'https://api.petstoreapi.com/v1/pets',\n  {\n    method: 'POST',\n    headers: {\n      'Authorization': `Bearer ${accessToken}`,\n      'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n      species: 'dog',\n      name: 'Buddy',\n      breed: 'Golden Retriever',\n      ageMonths: 24,\n      size: 'large',\n      color: 'Golden',\n      gender: 'male',\n      goodWithKids: true,\n\n      price: '150.00',\n      description: 'Friendly golden retriever looking for an active family'\n    })\n  }\n);\n\nconst newPet = await response.json();\nconsole.log(`Created pet with ID: ${newPet.id}`);"
+          },
+          {
+            "lang": "Shell",
+            "label": "cURL",
+            "source": "curl -X POST 'https://api.petstoreapi.com/v1/pets' \\\n  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"species\": \"dog\",\n    \"name\": \"Buddy\",\n    \"breed\": \"Golden Retriever\",\n    \"ageMonths\": 24,\n    \"size\": \"large\",\n    \"color\": \"Golden\",\n    \"gender\": \"male\",\n    \"goodWithKids\": true,\n\n    \"price\": \"150.00\",\n    \"description\": \"Friendly golden retriever looking for an active family\"\n  }'"
+          }
+        ]
+      }
+    },
+    "/pets/{id}": {
+      "get": {
+        "summary": "Get Pet",
+        "deprecated": false,
+        "description": "Retrieve detailed information about a specific pet.",
+        "operationId": "getPet",
+        "tags": [
+          "Pet"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "019bb615-7755-7389-b5fc-9165193e1146",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with pet details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                },
+                "examples": {
+                  "cat-example": {
+                    "summary": "A friendly cat",
+                    "value": {
+                      "id": "01936c8f-1234-7000-8000-111111111111",
+                      "species": "CAT",
+                      "name": "Whiskers",
+                      "breed": "Domestic Shorthair",
+                      "ageMonths": 18,
+                      "size": "MEDIUM",
+                      "color": "Orange Tabby",
+                      "gender": "MALE",
+                      "goodWithKids": true,
+                      "price": "75.00",
+                      "description": "Friendly and playful orange tabby looking for a loving home",
+                      "status": "AVAILABLE",
+                      "photos": [
+                        "https://cdn.petstoreapi.com/pets/01936c8f-1234-7000-8000-111111111111/photo1.jpg",
+                        "https://cdn.petstoreapi.com/pets/01936c8f-1234-7000-8000-111111111111/photo2.jpg"
+                      ],
+                      "medicalInfo": {
+                        "spayedNeutered": true,
+                        "vaccinated": true,
+                        "microchipped": true,
+                        "specialNeeds": false
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "RateLimit-Limit": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Remaining": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Reset": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "TypeScript",
+            "label": "TypeScript SDK",
+            "source": "import { PetStoreAPI } from '@petstoreapi/sdk';\n\nconst client = new PetStoreAPI({\n  apiKey: process.env.PETSTORE_API_KEY\n});\n\nconst pet = await client.pets.get('01936c8f-1234-7000-8000-111111111111');\nconsole.log(`Found ${pet.name}, a ${pet.ageMonths}-month-old ${pet.species}`);"
+          },
+          {
+            "lang": "Python",
+            "label": "Python",
+            "source": "from petstore import PetStoreAPI\n\nclient = PetStoreAPI(api_key=os.environ['PETSTORE_API_KEY'])\n\npet = client.pets.get('01936c8f-1234-7000-8000-111111111111')\nprint(f\"Found {pet.name}, a {pet.age_months}-month-old {pet.species}\")"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "JavaScript (Fetch)",
+            "source": "const response = await fetch(\n  'https://api.petstoreapi.com/v1/pets/01936c8f-1234-7000-8000-111111111111',\n  {\n    headers: {\n      'Accept': 'application/json'\n    }\n  }\n);\n\nconst pet = await response.json();\nconsole.log(`Found ${pet.name}, a ${pet.age_months}-month-old ${pet.species}`);"
+          },
+          {
+            "lang": "Shell",
+            "label": "cURL",
+            "source": "curl -X GET 'https://api.petstoreapi.com/v1/pets/01936c8f-1234-7000-8000-111111111111' \\\n  -H 'Accept: application/json'"
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Pet",
+        "deprecated": false,
+        "description": "Update information for an existing pet in the catalog.\n\n**Authentication**: Requires `write:pets` scope or Bearer token\n",
+        "operationId": "updatePet",
+        "tags": [
+          "Pet"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pet"
+              },
+              "example": {
+                "status": "PENDING"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Pet updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pet"
+                }
+              }
+            },
+            "headers": {
+              "RateLimit-Limit": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Remaining": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Reset": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": [
+              "write:pets"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Pet",
+        "deprecated": false,
+        "description": "Remove a pet from the system permanently.\n\n**Authentication**: Requires `write:pets` scope or Bearer token\n**Note**: This operation is irreversible. Consider updating the pet status to NOT_AVAILABLE instead.\n",
+        "operationId": "deletePet",
+        "tags": [
+          "Pet"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Pet deleted successfully",
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": [
+              "write:pets"
+            ]
+          }
+        ]
+      }
+    },
+    "/pets/{id}/images": {
+      "post": {
+        "summary": "Upload Pet Image",
+        "deprecated": false,
+        "description": "Upload a photo for the specified pet. Supports JPEG, PNG, and WebP formats up to 5MB.\n\n**Authentication**: Requires `write:pets` scope or Bearer token\n",
+        "operationId": "uploadPetPhoto",
+        "tags": [
+          "Pet"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the pet",
+            "required": true,
+            "example": "01936c8f-1234-7000-8000-111111111111",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "additionalMetadata": {
+                    "description": "Additional data to pass to server",
+                    "type": "string",
+                    "example": ""
+                  },
+                  "file": {
+                    "description": "File to upload",
+                    "type": "string",
+                    "format": "binary",
+                    "example": ""
+                  }
+                }
+              },
+              "example": {
+                "additionalMetadata": "",
+                "file": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                },
+                "example": {
+                  "code": 3,
+                  "type": "ex dolor",
+                  "message": "Pecus carcer cometes credo."
+                }
+              }
+            },
+            "headers": {}
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": [
+              "write:pets"
+            ]
+          }
+        ]
+      }
+    },
+    "/chat/completions": {
+      "post": {
+        "summary": "Pet Care AI Consultation",
+        "deprecated": false,
+        "description": "AI-powered consultation service for pet care questions and advice. This endpoint provides expert guidance on pet health, behavior, nutrition, training, and general care through an intelligent conversational interface. Supports streaming responses using Server-Sent Events (SSE) for real-time interaction.\n\n## OpenAI API Compatibility\n\nThis endpoint follows the **OpenAI Chat Completions API specification**, which has become the de facto industry standard for chat-based AI interactions. By maintaining compatibility with OpenAI's API design, this endpoint ensures:\n- Seamless integration with existing OpenAI-compatible SDKs and tools\n- Familiar developer experience for those already using OpenAI APIs\n- Easy migration path for applications built on OpenAI's platform\n\n**Note**: Some field names (e.g., `created` instead of `createdAt`) intentionally differ from this API's naming conventions to maintain full OpenAI compatibility.\n\n## Pet Care Expert AI\n\nOur AI consultation service helps pet owners with:\n- **Health & Wellness**: Symptom assessment, vaccination schedules, preventive care advice\n- **Nutrition**: Diet recommendations, feeding schedules, food allergies and sensitivities\n- **Behavior & Training**: Behavioral issues, training techniques, socialization tips\n- **Breed Information**: Breed-specific care requirements, temperament, compatibility\n- **Adoption Guidance**: Choosing the right pet, preparation for new pets, adoption process\n- **Emergency Guidance**: First aid advice, when to see a vet, urgent care situations\n\n**Disclaimer**: This AI provides general guidance only and does not replace professional veterinary care. Always consult a licensed veterinarian for medical diagnosis and treatment.\n\n## Streaming Mode\n\nWhen `stream: true`, the response is sent as Server-Sent Events (SSE), with each token delivered incrementally. This provides a better user experience for longer responses.\n\n### Stream Format\n\nEach chunk is sent as:\n```\ndata: {\"id\":\"chatcmpl_abc\",\"object\":\"chat.completion.chunk\",\"choices\":[{\"delta\":{\"content\":\"Hello\"},\"index\":0}]}\n\n```\n\nThe stream ends with:\n```\ndata: [DONE]\n\n```\n\n## Non-Streaming Mode\n\nWhen `stream: false` or omitted, returns a complete response object.",
+        "operationId": "createChatCompletion",
+        "tags": [
+          "Chat"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "messages"
+                ],
+                "properties": {
+                  "messages": {
+                    "type": "array",
+                    "description": "A list of messages comprising the conversation so far",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "role",
+                        "content"
+                      ],
+                      "properties": {
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "SYSTEM",
+                            "USER",
+                            "ASSISTANT"
+                          ],
+                          "description": "The role of the message author"
+                        },
+                        "content": {
+                          "type": "string",
+                          "description": "The contents of the message"
+                        }
+                      }
+                    },
+                    "minItems": 1
+                  },
+                  "model": {
+                    "type": "string",
+                    "description": "ID of the model to use",
+                    "enum": [
+                      "PET_ADVISOR_1",
+                      "PET_ADVISOR_TURBO"
+                    ],
+                    "default": "PET_ADVISOR_1"
+                  },
+                  "stream": {
+                    "type": "boolean",
+                    "description": "If true, partial message deltas will be sent via Server-Sent Events",
+                    "default": true
+                  },
+                  "maxTokens": {
+                    "type": "integer",
+                    "description": "Maximum number of tokens to generate",
+                    "minimum": 1,
+                    "maximum": 4096,
+                    "default": 1024
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "description": "Sampling temperature between 0 and 2",
+                    "minimum": 0,
+                    "maximum": 2,
+                    "default": 1
+                  }
+                },
+                "unevaluatedProperties": false
+              },
+              "examples": {
+                "pet-health-question": {
+                  "value": {
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "My dog has been scratching a lot lately. What could be causing this?"
+                      }
+                    ],
+                    "model": "pet-advisor-1",
+                    "stream": false
+                  },
+                  "summary": "Pet health consultation"
+                },
+                "pet-nutrition-advice": {
+                  "value": {
+                    "messages": [
+                      {
+                        "role": "user",
+                        "content": "What's the best diet for a senior cat with kidney issues?"
+                      }
+                    ],
+                    "model": "pet-advisor-1",
+                    "stream": false
+                  },
+                  "summary": "Pet nutrition consultation"
+                },
+                "streaming-conversation": {
+                  "value": {
+                    "messages": [
+                      {
+                        "role": "system",
+                        "content": "You are an expert pet care consultant specializing in dog and cat health, behavior, and nutrition."
+                      },
+                      {
+                        "role": "user",
+                        "content": "My puppy keeps biting furniture. How can I stop this behavior?"
+                      },
+                      {
+                        "role": "assistant",
+                        "content": "Puppy chewing is normal teething behavior. Provide appropriate chew toys and redirect when they bite furniture."
+                      },
+                      {
+                        "role": "user",
+                        "content": "What kind of chew toys do you recommend?"
+                      }
+                    ],
+                    "model": "pet-advisor-turbo",
+                    "stream": true,
+                    "temperature": 0.7
+                  },
+                  "summary": "Streaming multi-turn conversation"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response. Format depends on the `stream` parameter.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Non-streaming response (when stream=false)",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the completion",
+                      "pattern": "^chatcmpl_[a-z0-9]+$"
+                    },
+                    "object": {
+                      "type": "string",
+                      "const": "chat.completion"
+                    },
+                    "created": {
+                      "type": "integer",
+                      "description": "Unix timestamp of when the completion was created (OpenAI API compatibility: uses 'created' instead of 'createdAt')"
+                    },
+                    "model": {
+                      "type": "string",
+                      "description": "Model used for completion"
+                    },
+                    "choices": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": {
+                            "type": "integer"
+                          },
+                          "message": {
+                            "type": "object",
+                            "properties": {
+                              "role": {
+                                "type": "string",
+                                "const": "assistant"
+                              },
+                              "content": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "finishReason": {
+                            "type": "string",
+                            "enum": [
+                              "STOP",
+                              "LENGTH",
+                              "CONTENT_FILTER"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "usage": {
+                      "type": "object",
+                      "properties": {
+                        "promptTokens": {
+                          "type": "integer"
+                        },
+                        "completionTokens": {
+                          "type": "integer"
+                        },
+                        "totalTokens": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "complete-response": {
+                    "summary": "Complete chat response",
+                    "value": {
+                      "id": "chatcmpl_abc123",
+                      "object": "chat.completion",
+                      "created": 1702648800,
+                      "model": "pet-advisor-1",
+                      "choices": [
+                        {
+                          "index": 0,
+                          "message": {
+                            "role": "assistant",
+                            "content": "Before adopting a cat, consider these important factors:\n\n1. **Time Commitment**: Cats can live 15-20 years\n2. **Space**: Ensure you have adequate living space\n3. **Allergies**: Check if anyone in your household has cat allergies\n4. **Costs**: Budget for food, litter, vet care, and supplies\n5. **Lifestyle**: Consider if your schedule allows for proper care\n\nWould you like recommendations for cats currently available for adoption?"
+                          },
+                          "finishReason": "stop"
+                        }
+                      ],
+                      "usage": {
+                        "promptTokens": 15,
+                        "completionTokens": 89,
+                        "totalTokens": 104
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Content-Type": {
+                "required": false,
+                "description": "Response content type",
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "text/event-stream",
+                    "application/json"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": [
+              "chat:write"
+            ]
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "TypeScript",
+            "label": "TypeScript SDK (Non-Streaming)",
+            "source": "import { PetStoreAPI } from '@petstoreapi/sdk';\n\nconst client = new PetStoreAPI({\n  accessToken: process.env.OAUTH_ACCESS_TOKEN\n});\n\nconst completion = await client.chat.completions.create({\n  messages: [\n    { role: 'user', content: 'My dog has been scratching a lot lately. What could be causing this?' }\n  ],\n  model: 'pet-advisor-1',\n  stream: false\n});\n\nconsole.log(completion.choices[0].message.content);"
+          },
+          {
+            "lang": "TypeScript",
+            "label": "TypeScript SDK (Streaming)",
+            "source": "import { PetStoreAPI } from '@petstoreapi/sdk';\n\nconst client = new PetStoreAPI({\n  accessToken: process.env.OAUTH_ACCESS_TOKEN\n});\n\nconst stream = await client.chat.completions.create({\n  messages: [\n    { role: 'user', content: 'What\\'s the best diet for a senior cat with kidney issues?' }\n  ],\n  model: 'pet-advisor-1',\n  stream: true\n});\n\nfor await (const chunk of stream) {\n  const content = chunk.choices[0]?.delta?.content;\n  if (content) {\n    process.stdout.write(content);\n  }\n}"
+          },
+          {
+            "lang": "Python",
+            "label": "Python (Streaming)",
+            "source": "from petstore import PetStoreAPI\n\nclient = PetStoreAPI(access_token=os.environ['OAUTH_ACCESS_TOKEN'])\n\nstream = client.chat.completions.create(\n    messages=[\n        {\"role\": \"user\", \"content\": \"My puppy keeps biting furniture. How can I stop this behavior?\"}\n    ],\n    model=\"pet-advisor-1\",\n    stream=True\n)\n\nfor chunk in stream:\n    if chunk.choices[0].delta.content:\n        print(chunk.choices[0].delta.content, end=\"\")"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "JavaScript (Fetch with SSE)",
+            "source": "const response = await fetch(\n  'https://api.petstoreapi.com/v1/chat/completions',\n  {\n    method: 'POST',\n    headers: {\n      'Authorization': `Bearer ${accessToken}`,\n      'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n      messages: [\n        { role: 'user', content: 'How often should I take my cat to the vet for checkups?' }\n      ],\n      model: 'pet-advisor-1',\n      stream: true\n    })\n  }\n);\n\nconst reader = response.body.getReader();\nconst decoder = new TextDecoder();\n\nwhile (true) {\n  const { value, done } = await reader.read();\n  if (done) break;\n  \n  const chunk = decoder.decode(value);\n  const lines = chunk.split('\\n').filter(line => line.startsWith('data: '));\n  \n  for (const line of lines) {\n    const data = line.replace('data: ', '');\n    if (data === '[DONE]') break;\n    const parsed = JSON.parse(data);\n    process.stdout.write(parsed.choices[0]?.delta?.content || '');\n  }\n}"
+          },
+          {
+            "lang": "Shell",
+            "label": "cURL (Non-Streaming)",
+            "source": "curl -X POST 'https://api.petstoreapi.com/v1/chat/completions' \\\n  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"messages\": [\n      {\n        \"role\": \"user\",\n        \"content\": \"What should I know before adopting a cat?\"\n      }\n    ],\n    \"model\": \"pet-advisor-1\",\n    \"stream\": false\n  }'"
+          }
+        ]
+      }
+    },
+    "/inventory": {
+      "get": {
+        "summary": "Get Store Inventory",
+        "deprecated": false,
+        "description": "Returns aggregated inventory statistics across all pets in the store.\n\n**Note**: This endpoint correctly uses a singular noun because \"inventory\" is a mass noun\n(uncountable) representing aggregated statistics, not a collection of countable resources.\nSimilar endpoints: `/dashboard`, `/summary`, `/analytics`.\n",
+        "operationId": "getStoreInventory",
+        "tags": [
+          "Store"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "available",
+                    "pending",
+                    "adopted",
+                    "total"
+                  ],
+                  "properties": {
+                    "available": {
+                      "type": "integer",
+                      "format": "int32",
+                      "minimum": 0,
+                      "description": "Number of pets available for adoption",
+                      "example": 145
+                    },
+                    "pending": {
+                      "type": "integer",
+                      "format": "int32",
+                      "minimum": 0,
+                      "description": "Number of pets with pending adoption applications",
+                      "example": 23
+                    },
+                    "adopted": {
+                      "type": "integer",
+                      "format": "int32",
+                      "minimum": 0,
+                      "description": "Number of pets that have been adopted",
+                      "example": 892
+                    },
+                    "total": {
+                      "type": "integer",
+                      "format": "int32",
+                      "minimum": 0,
+                      "description": "Total number of pets in the system",
+                      "example": 1060
+                    },
+                    "bySpecies": {
+                      "type": "object",
+                      "description": "Breakdown of inventory by species",
+                      "additionalProperties": {
+                        "type": "integer",
+                        "format": "int32",
+                        "minimum": 0
+                      },
+                      "properties": {},
+                      "example": {
+                        "DOG": 523,
+                        "CAT": 387,
+                        "BIRD": 89,
+                        "RABBIT": 45,
+                        "FISH": 16
+                      }
+                    },
+                    "lastUpdatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp when the inventory statistics were last calculated (RFC 3339)",
+                      "example": "2026-01-07T10:30:00Z"
+                    }
+                  },
+                  "unevaluatedProperties": false
+                },
+                "example": {
+                  "available": 145,
+                  "pending": 23,
+                  "adopted": 892,
+                  "total": 1060,
+                  "bySpecies": {
+                    "DOG": 523,
+                    "CAT": 387,
+                    "BIRD": 89,
+                    "RABBIT": 45,
+                    "FISH": 16
+                  },
+                  "lastUpdatedAt": "2026-01-07T10:30:00Z"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "required": false,
+                "description": "Inventory data can be cached for up to 60 seconds",
+                "schema": {
+                  "type": "string",
+                  "example": "max-age=60"
+                }
+              },
+              "ETag": {
+                "required": false,
+                "description": "Entity tag for cache validation",
+                "schema": {
+                  "type": "string",
+                  "example": "\"33a64df551425fcc55e4d42a148795d9f25f89d4\""
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [],
+        "x-codeSamples": [
+          {
+            "lang": "TypeScript",
+            "label": "TypeScript SDK",
+            "source": "import { PetStoreAPI } from '@petstoreapi/sdk';\n\nconst client = new PetStoreAPI({\n  accessToken: process.env.OAUTH_ACCESS_TOKEN\n});\n\nconst inventory = await client.store.getInventory();\nconsole.log(`Available: ${inventory.available}`);\nconsole.log(`Pending: ${inventory.pending}`);\nconsole.log(`Adopted: ${inventory.adopted}`);"
+          },
+          {
+            "lang": "Python",
+            "label": "Python",
+            "source": "from petstore import PetStoreAPI\n\nclient = PetStoreAPI(access_token=os.environ['OAUTH_ACCESS_TOKEN'])\n\ninventory = client.store.get_inventory()\nprint(f\"Available: {inventory['available']}\")\nprint(f\"Pending: {inventory['pending']}\")\nprint(f\"Adopted: {inventory['adopted']}\")"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "JavaScript (Fetch)",
+            "source": "const response = await fetch(\n  'https://api.petstoreapi.com/v1/inventory',\n  {\n    headers: {\n      'Authorization': `Bearer ${accessToken}`\n    }\n  }\n);\n\nconst inventory = await response.json();\nconsole.log(`Available: ${inventory.available}`);\nconsole.log(`Pending: ${inventory.pending}`);\nconsole.log(`Adopted: ${inventory.adopted}`);"
+          },
+          {
+            "lang": "Shell",
+            "label": "cURL",
+            "source": "curl -X GET 'https://api.petstoreapi.com/v1/inventory' \\\n  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'"
+          }
+        ]
+      }
+    },
+    "/inventories": {
+      "get": {
+        "summary": "List all inventories",
+        "deprecated": false,
+        "description": "Returns a map of status codes to quantities.",
+        "operationId": "getInventory",
+        "tags": [
+          "Store"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Status values to filter inventory by (comma separated).",
+            "required": false,
+            "example": [
+              "available, pending"
+            ],
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer_token": []
+          }
+        ]
+      }
+    },
+    "/orders": {
+      "post": {
+        "summary": "Create Order",
+        "deprecated": false,
+        "description": "Create a new order for pet adoption. The order will be in PLACED status initially\nand requires payment to proceed.\n\n**Authentication**: Optional (anonymous orders allowed)\n",
+        "operationId": "createOrder",
+        "tags": [
+          "Store"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Order"
+              },
+              "example": {
+                "petId": "019b4132-70aa-764f-b315-e2803d882a24",
+                "userId": "019b4138-e0af-70b9-8f0c-6ea97d495dfa"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "example": {
+                  "id": "019b4139-1234-7abc-8def-123456789abc",
+                  "petId": "019b4132-70aa-764f-b315-e2803d882a24",
+                  "userId": "019b4138-e0af-70b9-8f0c-6ea97d495dfa",
+                  "status": "PLACED",
+                  "totalAmount": "150.00",
+                  "currency": "USD",
+                  "createdAt": "2025-12-21T13:56:23Z",
+                  "updatedAt": "2025-12-21T13:56:23Z"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "TypeScript",
+            "label": "TypeScript SDK",
+            "source": "import { PetStoreAPI } from '@petstoreapi/sdk';\n\nconst client = new PetStoreAPI({\n  accessToken: process.env.OAUTH_ACCESS_TOKEN\n});\n\nconst order = await client.orders.create({\n  petId: '019b4132-70aa-764f-b315-e2803d882a24',\n  userId: '019b4138-e0af-70b9-8f0c-6ea97d495dfa',\n  totalAmount: '150.00',\n  currency: 'USD',\n  status: 'PLACED'\n});\n\nconsole.log(`Order ${order.id} created successfully`);"
+          },
+          {
+            "lang": "Python",
+            "label": "Python",
+            "source": "from petstore import PetStoreAPI\n\nclient = PetStoreAPI(access_token=os.environ['OAUTH_ACCESS_TOKEN'])\n\norder = client.orders.create(\n    petId='019b4132-70aa-764f-b315-e2803d882a24',\n    userId='019b4138-e0af-70b9-8f0c-6ea97d495dfa',\n    totalAmount='150.00',\n    currency='USD',\n    status='PLACED'\n)\n\nprint(f\"Order {order.id} created successfully\")"
+          },
+          {
+            "lang": "JavaScript",
+            "label": "JavaScript (Fetch)",
+            "source": "const response = await fetch(\n  'https://api.petstoreapi.com/v1/orders',\n  {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n      petId: '019b4132-70aa-764f-b315-e2803d882a24',\n      userId: '019b4138-e0af-70b9-8f0c-6ea97d495dfa',\n      totalAmount: '150.00',\n      currency: 'USD',\n      status: 'PLACED'\n    })\n  }\n);\n\nconst order = await response.json();\nconsole.log(`Order ${order.id} created successfully`);"
+          },
+          {
+            "lang": "Shell",
+            "label": "cURL",
+            "source": "curl -X POST 'https://api.petstoreapi.com/v1/orders' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"petId\": 90180021,\n    \"quantity\": 1,\n    \"shipDate\": \"2025-08-15\",\n    \"status\": \"placed\"\n  }'"
+          }
+        ]
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "summary": "Get Order",
+        "deprecated": false,
+        "description": "Retrieve detailed information about a specific order, including status, items,\nand payment information.\n",
+        "operationId": "getOrder",
+        "tags": [
+          "Store"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                },
+                "example": {
+                  "id": "019b4139-5678-7def-9012-345678901234",
+                  "petId": "019b4127-54d5-76d9-b626-0d4c7bfce5b6",
+                  "userId": "019b4128-6a6b-777c-9ae8-335e962c68d8",
+                  "status": "APPROVED",
+                  "totalAmount": "225.00",
+                  "currency": "USD",
+                  "createdAt": "2025-11-15T08:30:00Z",
+                  "updatedAt": "2025-12-09T14:20:00Z"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Cancel Order",
+        "deprecated": false,
+        "description": "Cancel an existing order. Only orders in PLACED or APPROVED status can be cancelled.\n\n**Note**: Cancelled orders are marked with CANCELLED status rather than being deleted,\npreserving the order history for audit purposes.\n",
+        "operationId": "deleteOrder",
+        "tags": [
+          "Store"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the order",
+            "required": true,
+            "example": "019b4139-1234-7abc-8def-123456789abc",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Resource deleted successfully",
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Callback Example",
+        "deprecated": false,
+        "description": "Handles order events and supports asynchronous processing with Callback.",
+        "operationId": "callbackOrder",
+        "tags": [
+          "Store"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the order",
+            "required": true,
+            "example": "019b4139-1234-7abc-8def-123456789abc",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "string",
+                    "description": "The payment amount"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "The payment currency"
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "description": "Operation timestamp"
+                  },
+                  "callbackUrl": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL to call back when processing is complete"
+                  }
+                },
+                "required": [
+                  "amount",
+                  "currency",
+                  "timestamp",
+                  "callbackUrl"
+                ]
+              },
+              "example": {
+                "amount": "738.05",
+                "currency": "USD",
+                "timestamp": "1758613403",
+                "callbackUrl": "https://example.com/callbacks/orders/1312312"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Callback enqueued successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ],
+        "callbacks": {
+          "orderProcessed": {
+            "{$request.body#/callbackUrl}": {
+              "post": {
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "requestId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "orderId": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "COMPLETED",
+                              "FAILED"
+                            ]
+                          },
+                          "result": {
+                            "type": "object"
+                          },
+                          "timestamp": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "requestId",
+                          "orderId",
+                          "status",
+                          "timestamp"
+                        ]
+                      },
+                      "example": {
+                        "requestId": "0d7a3836-956f-453b-b633-94a16e720d60",
+                        "orderId": "1312312",
+                        "status": "completed",
+                        "result": {
+                          "transactionId": "tx_12345",
+                          "processingDetails": {
+                            "processor": "payment-gateway-1",
+                            "approvalCode": "AUTH123456"
+                          }
+                        },
+                        "timestamp": "1758613503"
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "200": {
+                    "description": "Callback received successfully"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{id}/payment": {
+      "post": {
+        "summary": "Pay Order",
+        "deprecated": false,
+        "description": "Process payment for an existing order.\n\n## Payment Workflow\n\nPayment processing follows this workflow:\n\n1. **Create Order**: First create an order using `POST /orders` (status: `placed`)\n2. **Submit Payment**: Call this endpoint with payment details (card or bank account)\n3. **Payment Processing**: The payment is processed with status `processing`\n4. **Payment Result**:\n   - **Success**: Payment status becomes `succeeded`, order status updates to `approved`\n   - **Failure**: Payment status becomes `failed`, order remains `placed` and can be retried\n5. **Receipt**: After successful payment, retrieve the receipt from the order details\n\n**Security Note**: Sensitive payment data (like CVC codes) are `writeOnly` and never returned in responses. Card numbers and account numbers are masked when read.",
+        "operationId": "createOrderPayment",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the order",
+            "required": true,
+            "example": "019b4139-1234-7abc-8def-123456789abc",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderPayment"
+              },
+              "examples": {
+                "Card": {
+                  "value": {
+                    "amount": "49.99",
+                    "currency": "GBP",
+                    "source": {
+                      "object": "card",
+                      "name": "J. Doe",
+                      "number": "4242424242424242",
+                      "cvc": "123",
+                      "expMonth": 12,
+                      "expYear": 2025,
+                      "addressLine1": "123 Fake Street",
+                      "addressLine2": "4th Floor",
+                      "addressCity": "London",
+                      "addressCountry": "gb",
+                      "addressPostCode": "N12 9XX"
+                    }
+                  },
+                  "summary": "Pay by Bank Card"
+                },
+                "Bank": {
+                  "value": {
+                    "amount": "100.50",
+                    "currency": "GBP",
+                    "source": {
+                      "object": "bank_account",
+                      "name": "J. Doe",
+                      "number": "00012345",
+                      "sortCode": "000123",
+                      "accountType": "individual",
+                      "bankName": "Starling Bank",
+                      "country": "gb"
+                    }
+                  },
+                  "summary": "Pay by Bank Account"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Payment successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderPayment"
+                },
+                "examples": {
+                  "1": {
+                    "summary": "Card Payment",
+                    "value": {
+                      "id": "2e3b4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
+                      "amount": "49.99",
+                      "currency": "GBP",
+                      "source": {
+                        "object": "card",
+                        "name": "J. Doe",
+                        "number": "************4242",
+                        "cvc": "123",
+                        "expMonth": 12,
+                        "expYear": 2025,
+                        "addressCountry": "gb",
+                        "addressPostCode": "N12 9XX"
+                      },
+                      "status": "succeeded"
+                    }
+                  },
+                  "2": {
+                    "summary": "Bank Account Payment",
+                    "value": {
+                      "id": "2e3b4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a",
+                      "amount": "100.50",
+                      "currency": "GBP",
+                      "source": {
+                        "object": "bank_account",
+                        "name": "J. Doe",
+                        "accountType": "individual",
+                        "number": "*********2345",
+                        "sortCode": "000123",
+                        "bankName": "Starling Bank",
+                        "country": "gb"
+                      },
+                      "status": "succeeded"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Create User",
+        "deprecated": false,
+        "description": "Register a new user account. Returns user details and authentication token.\n\n**Authentication**: Not required (public registration)\n",
+        "operationId": "createUser",
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              },
+              "example": {
+                "username": "kylekinh",
+                "firstName": "Kyle",
+                "lastName": "Kihn",
+                "email": "kyle.kihn@example.com",
+                "password": "SecurePass123!",
+                "phone": "+18638982053"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/users/{id}": {
+      "put": {
+        "summary": "Update User",
+        "deprecated": false,
+        "description": "Update user profile information.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Users can only update their own profile\n",
+        "operationId": "updateUser",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              },
+              "example": {
+                "firstName": "Jeffrey",
+                "lastName": "Kris",
+                "email": "jeffrey.kris@example.com",
+                "phone": "+18634063542"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "get": {
+        "summary": "Get User",
+        "deprecated": false,
+        "description": "Retrieve public profile information for a specific user.\n\n**Privacy**: Only public fields are returned unless requesting own profile\n",
+        "operationId": "getUserById",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the user",
+            "required": true,
+            "example": "user_abc123xyz",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operation successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                },
+                "example": {
+                  "id": "019b4138-e0af-70b9-8f0c-6ea97d495dfa",
+                  "username": "ameliehackett",
+                  "firstName": "Amelie",
+                  "lastName": "Hackett",
+                  "email": "amelie.hackett@example.com",
+                  "phone": "+16324377270",
+                  "createdAt": "2025-12-21T13:56:23Z",
+                  "updatedAt": "2025-12-21T13:56:23Z"
+                }
+              }
+            },
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete User Account",
+        "deprecated": false,
+        "description": "Permanently delete a user account and all associated data.\n\n**Authentication**: Required (Bearer token)\n**Authorization**: Users can only delete their own account\n**Note**: This operation is irreversible\n",
+        "operationId": "deleteUser",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Unique identifier for the user",
+            "required": true,
+            "example": "user_abc123xyz",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Resource deleted successfully",
+            "headers": {}
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest",
+            "description": ""
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/auth/tokens": {
+      "post": {
+        "summary": "Create Authentication Token",
+        "deprecated": false,
+        "description": "Authenticate user credentials and obtain an access token for API requests.\n\n**Authentication**: Not required (this is the login endpoint)\n**Returns**: Bearer token valid for 24 hours\n",
+        "operationId": "createToken",
+        "tags": [
+          "User"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "Login username",
+                    "example": "johndoe"
+                  },
+                  "password": {
+                    "type": "string",
+                    "writeOnly": true,
+                    "description": "User password (never returned in responses)",
+                    "example": "securePassword123"
+                  }
+                },
+                "unevaluatedProperties": false
+              },
+              "example": {
+                "username": "kylekinh",
+                "password": "SecurePass123!"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "Authentication token"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Token expiration time"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "RateLimit-Limit": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Remaining": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "RateLimit-Reset": {
+                "required": false,
+                "description": "",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized",
+            "description": ""
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity",
+            "description": ""
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests",
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/": {
+      "post": {
+        "summary": "GraphQL example",
+        "deprecated": false,
+        "description": "### Key Features\n\n- **Free and public:** No API key or authentication required.\n- **GraphQL Schema:** Explore relationships between countries, continents, and languages easily.\n- **Use cases:** Testing GraphQL clients, learning schema navigation, building demos, etc.\n\n---\n### Usage Instructions  \nIn the \"success\" debug base under this endpoint, you can directly make requests to the GraphQL API.\n- The query field has already been filled out.\n- Click the refresh button next to \"Schema fetched\" to fetch the schema.\n- Click send to directly send the request and receive a response.\n---\n\n### Endpoint\n\n**GraphQL Endpoint:**  \n```\nhttps://countries.trevorblades.com/\n```\n\n---\n\n### Main Schema Objects\n\n- **Country**\n  - Fields: `code`, `name`, `native` (native name), `phone` (country calling code), `continent`, `capital`, `currency`, `languages`, `emoji`, etc.\n  \n- **Continent**\n  - Fields: `code`, `name`, `countries` (list of countries in the continent)\n  \n- **Language**\n  - Fields: `code`, `name`, `native` (native name)\n  \n---\n\n### Example Queries\n\n**Get all countries with their code and name:**\n```graphql\n{\n  countries {\n    code\n    name\n  }\n}\n```\n\n**Get details of a single country:**\n```graphql\n{\n  country(code: \"JP\") {\n    name\n    capital\n    currency\n    languages {\n      name\n    }\n  }\n}\n```\n\n**List all continents and the countries in each:**\n```graphql\n{\n  continents {\n    name\n    countries {\n      name\n      code\n    }\n  }\n}\n```\n\n---\n\n### How to Use\n\n- You can access the API via your own GraphQL client, curl, or visit the [GraphQL Explorer for Countries API](https://countries.trevorblades.com/) in your browser.\n- Supports introspection, so you can see the full schema and documentation directly in the GraphQL Playground.\n\n---\n\n### Common Use-Cases\n\n- **Frontend prototyping:** For dropdowns (countries, continents, etc.)\n- **Demo apps:** Populate select inputs without backend work.\n- **GraphQL learning:** Practice writing queries and navigating relationships with real data.\n",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "The GraphQL query string."
+                  },
+                  "variables": {
+                    "type": "object",
+                    "description": "GraphQL variables for parameterized queries.",
+                    "additionalProperties": true,
+                    "properties": {},
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              },
+              "examples": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful GraphQL response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/.sse": {
+      "post": {
+        "summary": "SSE example",
+        "deprecated": false,
+        "description": "When you connect to the server using the POST method, an SSE connection will be automatically established, and the server will send the current time every second.",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    },
+    "/calculator.asmx": {
+      "post": {
+        "summary": "SOAP example",
+        "deprecated": false,
+        "description": "Add two integers from the request and return the result in the response.\nThe service is provided by DneOnline.",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "Content-Type",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "text/xml",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/xml": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "soap:Body": {
+                    "type": "object",
+                    "properties": {
+                      "Add": {
+                        "type": "object",
+                        "properties": {
+                          "intA": {
+                            "type": "string"
+                          },
+                          "intB": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "intA",
+                          "intB"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "Add"
+                    ]
+                  }
+                },
+                "required": [
+                  "soap:Body"
+                ],
+                "xml": {
+                  "name": "soap:Envelope"
+                }
+              },
+              "example": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n    <soap:Body>\n        <Add xmlns=\"http://tempuri.org/\">\n            <intA>5</intA>\n            <intB>7</intB>\n        </Add>\n    </soap:Body>\n</soap:Envelope>"
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "soap:Body": {
+                      "type": "object",
+                      "properties": {
+                        "AddResponse": {
+                          "type": "object",
+                          "properties": {
+                            "AddResult": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "AddResult"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "AddResponse"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "soap:Body"
+                  ],
+                  "xml": {
+                    "name": "soap:Envelope"
+                  }
+                },
+                "example": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n    <soap:Body>\n        <AddResponse xmlns=\"http://tempuri.org/\">\n            <AddResult>12</AddResult>\n        </AddResponse>\n    </soap:Body>\n</soap:Envelope>"
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "oauth2": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Pet": {
+        "type": "object",
+        "description": "Animal information in the pet store available for adoption.",
+        "required": [
+          "id",
+          "name",
+          "species",
+          "ageMonths",
+          "price",
+          "currency",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Unique identifier for the pet (UUID v7)",
+            "example": "019b4132-70aa-764f-b315-e2803d882a24"
+          },
+          "species": {
+            "type": "string",
+            "enum": [
+              "DOG",
+              "CAT",
+              "RABBIT",
+              "BIRD",
+              "REPTILE",
+              "OTHER"
+            ],
+            "description": "The species of the pet"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "The pet's name",
+            "example": "Whiskers"
+          },
+          "breed": {
+            "type": "string",
+            "description": "The breed of the pet",
+            "example": "Domestic Shorthair"
+          },
+          "ageMonths": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Age of the pet in months",
+            "example": 18
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "SMALL",
+              "MEDIUM",
+              "LARGE"
+            ],
+            "description": "Size category of the pet"
+          },
+          "color": {
+            "type": "string",
+            "description": "Primary color or coloring pattern",
+            "example": "Orange Tabby"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "UNKNOWN"
+            ],
+            "description": "The pet's gender"
+          },
+          "goodWithKids": {
+            "type": "boolean",
+            "description": "Whether the pet is good with children"
+          },
+          "price": {
+            "type": "string",
+            "description": "Adoption fee amount",
+            "example": "75.00"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code for the adoption fee (ISO 4217)",
+            "default": "USD",
+            "pattern": "^[A-Z]{3}$",
+            "example": "USD"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the pet's personality and traits"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "AVAILABLE",
+              "PENDING",
+              "ADOPTED",
+              "NOT_AVAILABLE"
+            ],
+            "description": "Current adoption status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Timestamp when the pet record was created (RFC 3339)",
+            "example": "2025-12-21T13:56:23Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Timestamp when the pet record was last updated (RFC 3339)",
+            "example": "2025-12-21T13:56:23Z"
+          },
+          "tenantId": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Optional tenant identifier for data isolation. When present, indicates this pet belongs to a specific tenant. Null or omitted means the pet is in the shared/public data pool.",
+            "nullable": true,
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "URLs of pet photos",
+            "minItems": 0
+          },
+          "medicalInfo": {
+            "type": "object",
+            "properties": {
+              "spayedNeutered": {
+                "type": "boolean",
+                "description": "Whether the pet has been spayed or neutered"
+              },
+              "vaccinated": {
+                "type": "boolean",
+                "description": "Whether the pet is up to date on vaccinations"
+              },
+              "microchipped": {
+                "type": "boolean",
+                "description": "Whether the pet has a microchip"
+              },
+              "specialNeeds": {
+                "type": "boolean",
+                "description": "Whether the pet has special medical needs"
+              },
+              "healthNotes": {
+                "type": "string",
+                "description": "Additional medical notes"
+              }
+            },
+            "unevaluatedProperties": false
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "User": {
+        "type": "object",
+        "description": "User account information",
+        "required": [
+          "id",
+          "username",
+          "email",
+          "firstName",
+          "lastName",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Unique user identifier (UUID v7)",
+            "example": "019b4138-e0af-70b9-8f0c-6ea97d495dfa"
+          },
+          "username": {
+            "type": "string",
+            "description": "Unique username for login",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "johndoe"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User email address",
+            "example": "user@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "User's first name",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "User's last name",
+            "example": "Doe"
+          },
+          "phone": {
+            "type": "string",
+            "pattern": "^\\+?[1-9]\\d{1,14}$",
+            "description": "Phone number in E.164 format",
+            "example": "+12025551234"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Account creation timestamp (RFC 3339)",
+            "example": "2025-12-21T13:56:23Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Account last update timestamp (RFC 3339)",
+            "example": "2025-12-21T13:56:23Z"
+          },
+          "tenantId": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Optional tenant identifier for data isolation. When present, indicates this user belongs to a specific tenant. Null or omitted means the user is in the shared/public data pool.",
+            "nullable": true,
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "newsletter": {
+                "type": "boolean",
+                "description": "Whether to receive newsletter emails"
+              },
+              "notifications": {
+                "type": "boolean",
+                "description": "Whether to receive notification emails"
+              }
+            },
+            "unevaluatedProperties": false
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "PetCollection": {
+        "type": "object",
+        "description": "Collection of pets with pagination",
+        "required": [
+          "data",
+          "pagination"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pet"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "required": [
+              "page",
+              "limit",
+              "totalItems",
+              "totalPages"
+            ],
+            "properties": {
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Current page number"
+              },
+              "limit": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of items per page"
+              },
+              "totalItems": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Total number of items"
+              },
+              "totalPages": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Total number of pages"
+              }
+            },
+            "unevaluatedProperties": false
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "OrderPayment": {
+        "description": "Order payment information with polymorphic payment sources",
+        "type": "object",
+        "required": [
+          "id",
+          "amount",
+          "currency",
+          "source",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "description": "Unique payment identifier",
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "example": "2e3b4f5a-6b7c-8d9e-0f1a-2b3c4d5e6f7a"
+          },
+          "amount": {
+            "description": "Payment amount (positive decimal)",
+            "type": "string",
+            "example": "49.99"
+          },
+          "currency": {
+            "description": "Three-letter ISO 4217 currency code (uppercase)",
+            "type": "string",
+            "enum": [
+              "USD",
+              "EUR",
+              "GBP",
+              "CAD",
+              "AUD"
+            ],
+            "default": "USD"
+          },
+          "source": {
+            "description": "Payment source (card or bank account)",
+            "discriminator": {
+              "propertyName": "object",
+              "mapping": {
+                "card": "#/components/schemas/CardPaymentSource",
+                "bankAccount": "#/components/schemas/BankAccountPaymentSource"
+              }
+            },
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CardPaymentSource"
+              },
+              {
+                "$ref": "#/components/schemas/BankAccountPaymentSource"
+              }
+            ]
+          },
+          "status": {
+            "description": "Payment status",
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PROCESSING",
+              "SUCCEEDED",
+              "FAILED",
+              "CANCELLED"
+            ],
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Payment creation timestamp"
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "CardPaymentSource": {
+        "type": "object",
+        "title": "Bank Card",
+        "description": "Debit or credit card payment source",
+        "externalDocs": {
+          "description": "Payment Security Best Practices and PCI Compliance Guide",
+          "url": "https://petstoreapi.com/docs/payments/security"
+        },
+        "required": [
+          "object",
+          "name",
+          "number",
+          "expMonth",
+          "expYear"
+        ],
+        "properties": {
+          "object": {
+            "type": "string",
+            "const": "card",
+            "description": "Discriminator value for card payments"
+          },
+          "name": {
+            "type": "string",
+            "description": "Cardholder name",
+            "example": "Jane Doe"
+          },
+          "number": {
+            "type": "string",
+            "description": "Card number (masked when reading)",
+            "pattern": "^[0-9*]{13,19}$",
+            "example": "4242424242424242"
+          },
+          "cvc": {
+            "type": "string",
+            "description": "Card security code",
+            "pattern": "^[0-9]{3,4}$",
+            "writeOnly": true
+          },
+          "expMonth": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "Expiration month (1-12)"
+          },
+          "expYear": {
+            "type": "integer",
+            "minimum": 2024,
+            "description": "Expiration year (4 digits)"
+          },
+          "brand": {
+            "type": "string",
+            "enum": [
+              "VISA",
+              "MASTERCARD",
+              "AMEX",
+              "DISCOVER",
+              "DINERS",
+              "JCB",
+              "UNIONPAY"
+            ],
+            "readOnly": true,
+            "description": "Card brand"
+          },
+          "last4": {
+            "type": "string",
+            "pattern": "^[0-9]{4}$",
+            "readOnly": true,
+            "description": "Last 4 digits"
+          },
+          "billingAddress": {
+            "type": "object",
+            "properties": {
+              "line1": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "line2": {
+                "type": "string",
+                "writeOnly": true
+              },
+              "city": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "postalCode": {
+                "type": "string"
+              },
+              "country": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "description": "ISO 3166-1 alpha-2 country code"
+              }
+            },
+            "unevaluatedProperties": false
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "Order": {
+        "type": "object",
+        "description": "Pet store order details",
+        "required": [
+          "id",
+          "petId",
+          "userId",
+          "status",
+          "totalAmount",
+          "currency",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Unique order identifier (UUID v7)",
+            "example": "019b4139-1234-7abc-8def-123456789abc"
+          },
+          "petId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the pet being ordered",
+            "example": "019b4132-70aa-764f-b315-e2803d882a24"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ID of the user placing the order",
+            "example": "019b4138-e0af-70b9-8f0c-6ea97d495dfa"
+          },
+          "status": {
+            "type": "string",
+            "description": "Order status",
+            "enum": [
+              "PLACED",
+              "APPROVED",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED"
+            ],
+            "example": "PLACED"
+          },
+          "totalAmount": {
+            "type": "string",
+            "description": "Total order amount",
+            "example": "125.50"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code for the order amount (ISO 4217)",
+            "default": "USD",
+            "pattern": "^[A-Z]{3}$",
+            "example": "USD"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Order creation timestamp (RFC 3339)",
+            "example": "2025-12-21T13:56:23Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true,
+            "description": "Order last update timestamp (RFC 3339)",
+            "example": "2025-12-21T13:56:23Z"
+          },
+          "tenantId": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true,
+            "description": "Optional tenant identifier for data isolation. When present, indicates this order belongs to a specific tenant. Null or omitted means the order is in the shared/public data pool.",
+            "nullable": true,
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "BankAccountPaymentSource": {
+        "type": "object",
+        "title": "Bank Account",
+        "description": "Bank account payment source",
+        "externalDocs": {
+          "description": "ACH Payment Processing and Bank Account Verification",
+          "url": "https://petstoreapi.com/docs/payments/ach-guide"
+        },
+        "required": [
+          "object",
+          "accountHolderName",
+          "accountNumber",
+          "routingNumber",
+          "accountType"
+        ],
+        "properties": {
+          "object": {
+            "type": "string",
+            "const": "bank_account",
+            "description": "Discriminator value for bank account payments"
+          },
+          "accountHolderName": {
+            "type": "string",
+            "description": "Name of account holder"
+          },
+          "accountNumber": {
+            "type": "string",
+            "description": "Bank account number (masked when reading)",
+            "pattern": "^[0-9*]{4,17}$"
+          },
+          "routingNumber": {
+            "type": "string",
+            "description": "Bank routing number",
+            "pattern": "^[0-9]{9}$"
+          },
+          "accountType": {
+            "type": "string",
+            "enum": [
+              "CHECKING",
+              "SAVINGS"
+            ],
+            "description": "Type of bank account"
+          },
+          "bankName": {
+            "type": "string",
+            "readOnly": true,
+            "description": "Name of the bank"
+          },
+          "last4": {
+            "type": "string",
+            "pattern": "^[0-9]{4}$",
+            "readOnly": true,
+            "description": "Last 4 digits of account number"
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "ApiResponse": {
+        "type": "object",
+        "description": "Generic API response",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable message"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation was successful"
+          }
+        },
+        "unevaluatedProperties": false
+      },
+      "Error": {
+        "type": "object",
+        "description": "RFC 9457 Problem Details for HTTP APIs",
+        "required": [
+          "type",
+          "title",
+          "status"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri",
+            "description": "A URI reference that identifies the problem type",
+            "example": "https://petstoreapi.com/errors/not-found"
+          },
+          "title": {
+            "type": "string",
+            "description": "A short, human-readable summary of the problem",
+            "example": "Resource Not Found"
+          },
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status code",
+            "example": 404
+          },
+          "detail": {
+            "type": "string",
+            "description": "A human-readable explanation specific to this occurrence",
+            "example": "The requested pet with ID '123' was not found"
+          },
+          "instance": {
+            "type": "string",
+            "format": "uri",
+            "description": "A URI reference that identifies the specific occurrence",
+            "example": "/v1/pets/123"
+          },
+          "errors": {
+            "type": "array",
+            "description": "Detailed validation errors (for 422 responses)",
+            "items": {
+              "type": "object",
+              "required": [
+                "field",
+                "message"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "The field that failed validation"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Description of the validation error"
+                },
+                "code": {
+                  "type": "string",
+                  "description": "Machine-readable error code"
+                }
+              },
+              "unevaluatedProperties": false
+            }
+          }
+        },
+        "unevaluatedProperties": false
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "invalid-parameter": {
+                "summary": "invalid-parameter",
+                "value": {
+                  "type": "https://petstoreapi.com/errors/bad-request",
+                  "title": "Bad Request",
+                  "status": 400,
+                  "detail": "Invalid value for parameter 'status'. Must be one of: available, pending, sold.",
+                  "instance": "/pets"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "missing-token": {
+                "summary": "missing-token",
+                "value": {
+                  "type": "https://petstoreapi.com/errors/unauthorized",
+                  "title": "Unauthorized",
+                  "status": 401,
+                  "detail": "Authentication is required to access this resource. Please provide a valid OAuth 2.0 token."
+                }
+              }
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "insufficient-permissions": {
+                "summary": "insufficient-permissions",
+                "value": {
+                  "type": "https://petstoreapi.com/errors/forbidden",
+                  "title": "Forbidden",
+                  "status": 403,
+                  "detail": "You do not have permission to access this resource."
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "pet-not-found": {
+                "summary": "pet-not-found",
+                "value": {
+                  "type": "https://petstoreapi.com/errors/not-found",
+                  "title": "Not Found",
+                  "status": 404,
+                  "detail": "The requested pet with ID '123' was not found.",
+                  "instance": "/pets/123"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "rate-limit-exceeded": {
+                "summary": "rate-limit-exceeded",
+                "value": {
+                  "type": "https://petstoreapi.com/errors/rate-limit-exceeded",
+                  "title": "Too Many Requests",
+                  "status": 429,
+                  "detail": "Rate limit exceeded. Please wait 60 seconds before making another request."
+                }
+              }
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "server-error": {
+                "summary": "server-error",
+                "value": {
+                  "type": "https://petstoreapi.com/errors/internal-server-error",
+                  "title": "Internal Server Error",
+                  "status": 500,
+                  "detail": "An unexpected error occurred. Please try again later."
+                }
+              }
+            }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "validation-errors": {
+                "summary": "validation-errors",
+                "value": {
+                  "type": "https://petstoreapi.com/errors/validation-error",
+                  "title": "Validation Error",
+                  "status": 422,
+                  "detail": "The request body contains validation errors.",
+                  "instance": "/pets",
+                  "errors": [
+                    {
+                      "field": "name",
+                      "message": "Pet name is required",
+                      "code": "required_field"
+                    },
+                    {
+                      "field": "status",
+                      "message": "Invalid status value",
+                      "code": "invalid_format"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer_token": {
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "description": "OAuth 2.0 authorization with multiple flows including device authorization for IoT devices and smart TVs",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://auth.petstoreapi.com/authorize",
+            "tokenUrl": "https://auth.petstoreapi.com/token",
+            "refreshUrl": "https://auth.petstoreapi.com/refresh",
+            "scopes": {
+              "read:pets": "Read pet information",
+              "write:pets": "Create and update pets",
+              "read:orders": "Read order information",
+              "write:orders": "Create and manage orders",
+              "read:user": "Read user profile",
+              "write:user": "Update user profile",
+              "chat:write": "Access AI chat completions"
+            }
+          }
+        }
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token authentication using JWT (JSON Web Token). Include the token in the Authorization header as: `Authorization: Bearer <token>`"
+      }
+    }
+  },
+  "servers": [],
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "oauth2": []
+    }
+  ]
+}

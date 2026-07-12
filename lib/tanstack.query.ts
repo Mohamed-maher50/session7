@@ -3,7 +3,8 @@ import {
   defaultShouldDehydrateQuery,
   environmentManager,
 } from "@tanstack/react-query";
-
+import createClient from "openapi-react-query";
+import { client } from "./client";
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -35,3 +36,5 @@ export function getQueryClient() {
     return browserQueryClient;
   }
 }
+
+export const $api = createClient(client);
